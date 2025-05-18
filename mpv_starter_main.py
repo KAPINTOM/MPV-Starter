@@ -18,6 +18,7 @@ import traceback
 import threading
 import urllib.parse
 import webbrowser
+import tkinter.ttk as ttk
 
 # Configuración de archivos (siempre relativos a CONFIG_DIR)
 CONFIG_FILE = Path(CONFIG_DIR) / "config.conf"
@@ -453,20 +454,59 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Lanzador de MPV")
-        self.geometry("680x550")
-        
+        self.geometry("700x570")
+        self.configure(bg="#f7f7f7")  # Light background
+
+        # Light theme style configuration
+        self.style = ttk.Style(self)
+        self.style.theme_use("clam")
+        self.style.configure("TButton",
+            font=("Segoe UI", 11),
+            padding=6,
+            background="#1976d2",
+            foreground="#ffffff",
+            borderwidth=0
+        )
+        self.style.map("TButton",
+            background=[("active", "#1565c0"), ("!active", "#1976d2")],
+            foreground=[("active", "#ffffff"), ("!active", "#ffffff")]
+        )
+        self.style.configure("Accent.TButton",
+            font=("Segoe UI", 11, "bold"),
+            background="#43a047",
+            foreground="#ffffff"
+        )
+        self.style.map("Accent.TButton",
+            background=[("active", "#388e3c"), ("!active", "#43a047")]
+        )
+        self.style.configure("TLabel",
+            background="#f7f7f7",
+            foreground="#222222",
+            font=("Segoe UI", 11)
+        )
+        self.style.configure("TEntry",
+            font=("Segoe UI", 11),
+            fieldbackground="#ffffff",
+            foreground="#222222"
+        )
+        self.style.configure("TCheckbutton",
+            background="#f7f7f7",
+            foreground="#222222",
+            font=("Segoe UI", 10)
+        )
+
         # Configuración inicial
         self.setup_files()
         self.load_all_data()
         self.param_vars: Dict[str, tk.BooleanVar] = {}
         self.language = self.load_language()
-        
+
         # Interfaz gráfica
         self.create_widgets()
         self.setup_menu()
         self.refresh_param_checkboxes()
         self.update_params_entry()
-        
+
         # Evento de cierre seguro
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -476,17 +516,23 @@ class Application(tk.Tk):
         try:
             for path, default in [
                 (CONFIG_FILE, {"mpv_path": ""}),
-                (PARAMS_FILE, []),
+                (PARAMS_FILE, ""),  # Crear archivo vacío para params
                 (HISTORY_FILE, []),
                 (BOOKMARKS_FILE, {}),
                 (LANGUAGE_FILE, "en")
             ]:
                 if not path.exists():
                     try:
-                        self.save_json(path, default)
+                        if path == PARAMS_FILE:
+                            path.write_text("", encoding="utf-8")  # Crear archivo vacío
+                        else:
+                            self.save_json(path, default)
                     except FileNotFoundError:
                         path.parent.mkdir(parents=True, exist_ok=True)
-                        self.save_json(path, default)
+                        if path == PARAMS_FILE:
+                            path.write_text("", encoding="utf-8")
+                        else:
+                            self.save_json(path, default)
         except Exception as e:
             self.show_error(f"Error inicializando archivos: {e}")
 
@@ -587,35 +633,28 @@ class Application(tk.Tk):
 
     def save_json(self, file_path: Path, data: Union[list, dict]):
         """Guarda datos en JSON con formato consistente y manejo seguro"""
+        temp_path = file_path.with_suffix(".tmp")
         try:
-            # Crear directorio si no existe
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Guardado temporal
-            temp_path = file_path.with_suffix(".tmp")
             with temp_path.open("w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False, sort_keys=True)
-            
-            # Reemplazar archivo original
             if file_path.exists():
                 backup = file_path.with_suffix(".bak")
                 file_path.replace(backup)
             temp_path.replace(file_path)
-            
         except Exception as e:
             self.show_error(f"Error guardando {file_path.name}: {e}")
-            if temp_path.exists():
-                temp_path.unlink()
-    
+            try:
+                if temp_path.exists():
+                    temp_path.unlink()
+            except Exception:
+                pass
+
     def save_config(self, file_path: Path, data: Union[dict, list]):
         """Guarda la configuración en un archivo, ya sea como diccionario o lista"""
+        temp_path = file_path.with_suffix(".tmp")
         try:
-            # Crear directorio si no existe
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Guardado temporal
-            temp_path = file_path.with_suffix(".tmp")
-            
             if isinstance(data, dict):
                 with temp_path.open("w", encoding="utf-8") as f:
                     for key, value in data.items():
@@ -626,17 +665,17 @@ class Application(tk.Tk):
                         f.write(f"{item}\n")
             else:
                 raise ValueError("Data must be a dictionary or a list")
-            
-            # Reemplazar archivo original
             if file_path.exists():
                 backup = file_path.with_suffix(".bak")
                 file_path.replace(backup)
             temp_path.replace(file_path)
-            
         except Exception as e:
             self.show_error(f"Error guardando {file_path.name}: {e}")
-            if temp_path.exists():
-                temp_path.unlink()
+            try:
+                if temp_path.exists():
+                    temp_path.unlink()
+            except Exception:
+                pass
 
     # endregion
 
@@ -644,39 +683,63 @@ class Application(tk.Tk):
     def create_widgets(self):
         """Crea los elementos de la interfaz gráfica usando traducciones."""
         self.grid_columnconfigure(1, weight=1)
+        pad = {'padx': 12, 'pady': 8}
 
-        tk.Button(self, text=get_translation("select_mpv", self.language), command=self.select_mpv_exe).grid(
-            row=0, column=0, columnspan=2, pady=5, sticky="ew"
+        # Botón para seleccionar MPV
+        ttk.Button(self, text=get_translation("select_mpv", self.language), command=self.select_mpv_exe).grid(
+            row=0, column=0, columnspan=2, sticky="ew", **pad
         )
-        self.mpv_label = tk.Label(
+
+        # Nuevo botón para cargar archivo local
+        ttk.Button(self, text="Cargar archivo local", command=self.load_local_file).grid(
+            row=1, column=0, columnspan=2, sticky="ew", **pad
+        )
+
+        self.mpv_label = ttk.Label(
             self,
             text=f"{get_translation('mpv', self.language)} {self.mpv_path}" if self.mpv_path else get_translation("mpv_not_selected", self.language),
-            fg="blue", wraplength=500
+            font=("Segoe UI", 10, "italic"), foreground="#1976d2", background="#f7f7f7"
         )
-        self.mpv_label.grid(row=1, column=0, columnspan=2, pady=5, sticky="w")
+        self.mpv_label.grid(row=2, column=0, columnspan=2, sticky="w", **pad)
 
-        tk.Label(self, text=get_translation("media_link", self.language)).grid(row=2, column=0, padx=10, pady=5, sticky="e")
-        self.link_entry = tk.Entry(self, width=60)
-        self.link_entry.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
+        ttk.Label(self, text=get_translation("media_link", self.language)).grid(row=3, column=0, sticky="e", **pad)
+        self.link_entry = ttk.Entry(self, width=60)
+        self.link_entry.grid(row=3, column=1, sticky="ew", **pad)
 
-        tk.Label(self, text=get_translation("params", self.language)).grid(row=3, column=0, padx=10, pady=5, sticky="e")
-        self.params_entry = tk.Entry(self, width=60)
-        self.params_entry.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
+        ttk.Label(self, text=get_translation("params", self.language)).grid(row=4, column=0, sticky="e", **pad)
+        self.params_entry = ttk.Entry(self, width=60)
+        self.params_entry.grid(row=4, column=1, sticky="ew", **pad)
 
-        tk.Label(self, text=get_translation("bookmark_title", self.language)).grid(row=4, column=0, padx=10, pady=5, sticky="e")
-        self.bookmark_title_entry = tk.Entry(self, width=30)
-        self.bookmark_title_entry.grid(row=4, column=1, padx=(10,0), pady=5, sticky="w")
-        tk.Button(self, text=get_translation("save_bookmark", self.language), command=self.save_bookmark).grid(
-            row=4, column=1, padx=(200, 80), pady=5, sticky="w"
-        )
-
-        tk.Button(self, text=get_translation("launch_mpv", self.language), command=self.launch_mpv, bg="#4CAF50", fg="white").grid(
-            row=5, column=0, columnspan=2, pady=10, sticky="ew"
+        ttk.Label(self, text=get_translation("bookmark_title", self.language)).grid(row=5, column=0, sticky="e", **pad)
+        self.bookmark_title_entry = ttk.Entry(self, width=30)
+        self.bookmark_title_entry.grid(row=5, column=1, sticky="w", padx=(12,0), pady=8)
+        ttk.Button(self, text=get_translation("save_bookmark", self.language), command=self.save_bookmark).grid(
+            row=5, column=1, padx=(200, 80), pady=8, sticky="w"
         )
 
-        tk.Label(self, text=get_translation("saved_params", self.language)).grid(row=7, column=0, padx=10, pady=5, sticky="ne")
-        self.param_frame = tk.Frame(self)
-        self.param_frame.grid(row=7, column=1, padx=10, pady=5, sticky="nsew")
+        ttk.Button(self, text=get_translation("launch_mpv", self.language), command=self.launch_mpv, style="Accent.TButton").grid(
+            row=6, column=0, columnspan=2, pady=16, padx=12, sticky="ew"
+        )
+
+        ttk.Label(self, text=get_translation("saved_params", self.language)).grid(row=8, column=0, sticky="ne", **pad)
+        self.param_frame = ttk.Frame(self, style="TFrame")
+        self.param_frame.grid(row=8, column=1, sticky="nsew", **pad)
+        self.param_frame.configure(style="TFrame")
+
+    def load_local_file(self):
+        """Permite seleccionar un archivo local y lo coloca en el campo de enlace."""
+        file_path = filedialog.askopenfilename(
+            title="Seleccionar archivo local",
+            filetypes=[("Todos los archivos", "*.*")]
+        )
+        if file_path:
+            self.link_entry.delete(0, tk.END)
+            self.link_entry.insert(0, file_path)
+            # Opcional: puedes sugerir un título para el marcador basado en el nombre del archivo
+            import os
+            suggested_title = os.path.basename(file_path)
+            self.bookmark_title_entry.delete(0, tk.END)
+            self.bookmark_title_entry.insert(0, suggested_title)
 
     def setup_menu(self):
         """Configura los menús desplegables, incluyendo el de idioma."""
@@ -951,56 +1014,116 @@ class Application(tk.Tk):
             self.show_error(f"Error iniciando MPV: {e}")
 
     def show_about_window(self):
-        """Muestra la ventana Acerca de con traducción."""
+        """Muestra la ventana Acerca de con traducción y diseño mejorado."""
         about = tk.Toplevel(self)
         about.title(get_translation("about", self.language))
-        about.geometry("1000x800")
+        about.geometry("600x650")
         about.resizable(False, False)
+        about.configure(bg="#f7f7f7")
 
+        # Marco principal con borde y fondo
+        main_frame = tk.Frame(about, bg="#ffffff", bd=2, relief="groove")
+        main_frame.pack(fill="both", expand=True, padx=24, pady=24)
+
+        # Logo o icono (opcional, si tienes un archivo PNG)
+        # try:
+        #     from PIL import Image, ImageTk
+        #     logo_img = Image.open("logo.png").resize((64, 64))
+        #     logo = ImageTk.PhotoImage(logo_img)
+        #     logo_label = tk.Label(main_frame, image=logo, bg="#ffffff")
+        #     logo_label.image = logo
+        #     logo_label.pack(pady=(10, 0))
+        # except Exception:
+        #     pass
+
+        # Título grande
         tk.Label(
-            about,
+            main_frame,
             text=get_translation("title", self.language),
-            font=("Arial", 15, "bold")
-        ).pack(pady=(15, 5))
+            font=("Segoe UI", 20, "bold"),
+            bg="#ffffff",
+            fg="#1976d2"
+        ).pack(pady=(18, 8))
 
+        # Línea decorativa
+        tk.Frame(main_frame, bg="#1976d2", height=2).pack(fill="x", padx=10, pady=(0, 16))
+
+        # Texto descriptivo
         tk.Label(
-            about,
+            main_frame,
             text=get_translation("about_text", self.language),
-            font=("Arial", 10),
+            font=("Segoe UI", 11),
             justify="left",
-            wraplength=570
-        ).pack(pady=(5, 10))
+            wraplength=540,
+            bg="#ffffff",
+            fg="#222222"
+        ).pack(pady=(0, 18))
 
+        # Autor destacado
         tk.Label(
-            about,
+            main_frame,
             text=get_translation("about_author", self.language),
-            font=("Arial", 12, "bold")
-        ).pack(pady=(5, 5))
+            font=("Segoe UI", 12, "bold"),
+            bg="#ffffff",
+            fg="#388e3c"
+        ).pack(pady=(0, 10))
 
-        tk.Label(about, text=get_translation("about_github", self.language), font=("Arial", 10)).pack(pady=(10, 0))
+        # Enlaces con iconos y subrayado
+        link_style = {"font": ("Segoe UI", 10, "underline"), "bg": "#ffffff", "fg": "#1565c0", "cursor": "hand2"}
+
+        # GitHub personal
+        gh_frame = tk.Frame(main_frame, bg="#ffffff")
+        gh_frame.pack(pady=(8, 0))
+        tk.Label(gh_frame, text="🐙", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
+        tk.Label(gh_frame, text=get_translation("about_github", self.language), font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
+        gh_link = tk.Label(gh_frame, text="github.com/KAPINTOM", **link_style)
+        gh_link.pack(side="left")
+        gh_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/KAPINTOM"))
+
+        # MPV repo
+        repo_frame = tk.Frame(main_frame, bg="#ffffff")
+        repo_frame.pack(pady=(8, 0))
+        tk.Label(repo_frame, text="📦", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
+        tk.Label(repo_frame, text=get_translation("about_repo", self.language), font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
+        repo_link = tk.Label(repo_frame, text="github.com/mpv-player/mpv", **link_style)
+        repo_link.pack(side="left")
+        repo_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/mpv-player/mpv"))
+
+        # MPV downloads
+        dl_frame = tk.Frame(main_frame, bg="#ffffff")
+        dl_frame.pack(pady=(8, 0))
+        tk.Label(dl_frame, text="⬇️", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
+        tk.Label(dl_frame, text=get_translation("about_download", self.language), font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
+        dl_link = tk.Label(dl_frame, text="mpv-winbuild releases", **link_style)
+        dl_link.pack(side="left")
+        dl_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/zhongfly/mpv-winbuild/releases"))
+
+        # Línea decorativa inferior
+        tk.Frame(main_frame, bg="#1976d2", height=2).pack(fill="x", padx=10, pady=(24, 8))
+
+        # Año y botón cerrar
+        bottom_frame = tk.Frame(main_frame, bg="#ffffff")
+        bottom_frame.pack(fill="x", pady=(8, 0))
+        tk.Label(
+            bottom_frame,
+            text=get_translation("about_year", self.language),
+            font=("Segoe UI", 10, "italic"),
+            bg="#ffffff",
+            fg="#888888"
+        ).pack(side="left", padx=(4, 0))
         tk.Button(
-            about, text="github.com/KAPINTOM",
-            command=lambda: webbrowser.open("https://github.com/KAPINTOM"),
-            fg="blue", cursor="hand2"
-        ).pack(pady=2)
-
-        tk.Label(about, text=get_translation("about_repo", self.language), font=("Arial", 10)).pack(pady=(15, 0))
-        tk.Button(
-            about, text="github.com/mpv-player/mpv",
-            command=lambda: webbrowser.open("https://github.com/mpv-player/mpv"),
-            fg="blue", cursor="hand2"
-        ).pack(pady=2)
-
-        tk.Label(about, text=get_translation("about_download", self.language), font=("Arial", 10)).pack(pady=(15, 0))
-        tk.Button(
-            about, text="mpv-winbuild releases",
-            command=lambda: webbrowser.open("https://github.com/zhongfly/mpv-winbuild/releases"),
-            fg="blue", cursor="hand2"
-        ).pack(pady=2)
-
-        tk.Label(about, text=get_translation("about_year", self.language), font=("Arial", 10, "italic")).pack(pady=(20, 0))
-
-        tk.Button(about, text=get_translation("close", self.language), command=about.destroy).pack(pady=(15, 10))
+            bottom_frame,
+            text=get_translation("close", self.language),
+            command=about.destroy,
+            font=("Segoe UI", 10, "bold"),
+            bg="#1976d2",
+            fg="#ffffff",
+            activebackground="#1565c0",
+            activeforeground="#ffffff",
+            relief="flat",
+            padx=16,
+            pady=4
+        ).pack(side="right", padx=(0, 4))
 
     # endregion
 
