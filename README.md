@@ -1,6 +1,6 @@
 # MPV Starter
 
-<img src="https://github.com/KAPINTOM/MPV-Starter/blob/main/Images/mpv%20starter.png" alt="GUI" width="200">
+<img src="https://github.com/KAPINTOM/MPV-Starter/blob/main/Images/mpv%20starter.png" alt="GUI" width="500">
 
 [English below]  
 [日本語は下記]  
