@@ -19,6 +19,8 @@ import threading
 import urllib.parse
 import webbrowser
 import tkinter.ttk as ttk
+import requests
+import shutil
 
 # Configuración de archivos (siempre relativos a CONFIG_DIR)
 CONFIG_FILE = Path(CONFIG_DIR) / "config.conf"
@@ -478,6 +480,18 @@ TRANSLATIONS = {
         "it": "Aggiorna MPV",
         "ru": "Обновить MPV",
         "de": "MPV aktualisieren"
+    },
+    "install_modern_ui": {
+        "en": "Install Modern UI",
+        "es": "Instalar UI Moderna",
+        "ja": "モダンUIをインストール",
+        "zh": "安装现代界面",
+        "ko": "모던 UI 설치",
+        "pt": "Instalar UI Moderna",
+        "fr": "Installer l'UI Moderne",
+        "it": "Installa UI Moderna",
+        "ru": "Установить современный интерфейс",
+        "de": "Moderne UI installieren"
     }
     # Agrega más claves según sea necesario...
 }
@@ -813,6 +827,12 @@ class Application(tk.Tk):
             header_frame,
             text="🔄 " + get_translation("update_mpv", self.language),
             command=self.update_mpv
+        ).pack(fill="x", pady=(0, 5))
+
+        ttk.Button(
+            header_frame,
+            text="🎨 " + get_translation("install_modern_ui", self.language),
+            command=self.install_modern_ui
         ).pack(fill="x", pady=(0, 5))
 
         ttk.Button(
@@ -1210,7 +1230,7 @@ class Application(tk.Tk):
         """Muestra la ventana Acerca de con diseño horizontal."""
         about = tk.Toplevel(self)
         about.title(get_translation("about", self.language))
-        about.geometry("1000x600")
+        about.geometry("1200x850")
         about.configure(bg="#ffffff")
 
         # Marco principal con borde y fondo
@@ -1225,11 +1245,11 @@ class Application(tk.Tk):
         left_frame = tk.Frame(main_frame, bg="#ffffff")
         left_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
 
-        # Título grande
+        # Título grande (reducido de 20 a 18)
         tk.Label(
             left_frame,
             text=get_translation("title", self.language),
-            font=("Segoe UI", 20, "bold"),
+            font=("Segoe UI", 18, "bold"),
             bg="#ffffff",
             fg="#1976d2"
         ).pack(pady=(0, 8))
@@ -1237,13 +1257,13 @@ class Application(tk.Tk):
         # Línea decorativa
         tk.Frame(left_frame, bg="#1976d2", height=2).pack(fill="x", pady=(0, 16))
 
-        # Texto descriptivo
+        # Texto descriptivo (reducido de 11 a 10)
         tk.Label(
             left_frame,
             text=get_translation("about_text", self.language),
-            font=("Segoe UI", 11),
+            font=("Segoe UI", 10),
             justify="left",
-            wraplength=450,  # Ajustado para mejor distribución
+            wraplength=450,
             bg="#ffffff",
             fg="#222222"
         ).pack(fill="both", expand=True, pady=(0, 10))
@@ -1252,57 +1272,95 @@ class Application(tk.Tk):
         right_frame = tk.Frame(main_frame, bg="#ffffff")
         right_frame.grid(row=0, column=1, sticky="nsew", padx=(12, 0))
 
-        # Autor destacado
+        # Autor destacado (reducido de 12 a 11)
         tk.Label(
             right_frame,
             text=get_translation("about_author", self.language),
-            font=("Segoe UI", 12, "bold"),
+            font=("Segoe UI", 11, "bold"),
             bg="#ffffff",
             fg="#388e3c"
         ).pack(pady=(0, 20))
 
-        # Enlaces con iconos y subrayado
-        link_style = {"font": ("Segoe UI", 10, "underline"), "bg": "#ffffff", "fg": "#1565c0", "cursor": "hand2"}
+        # Enlaces con iconos (reducido de 10 a 9)
+        link_style = {"font": ("Segoe UI", 9, "underline"), "bg": "#ffffff", "fg": "#1565c0", "cursor": "hand2"}
 
-        # Project repository
+        # Crear frames para los enlaces antes de los iconos
         project_frame = tk.Frame(right_frame, bg="#ffffff")
-        project_frame.pack(fill="x", pady=(4, 8))
-        tk.Label(project_frame, text="📁", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
-        tk.Label(project_frame, text=get_translation("about_project", self.language), 
-                 font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
-        project_link = tk.Label(project_frame, text="MPV-Starter", **link_style)
-        project_link.pack(side="left")
-        project_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/KAPINTOM/MPV-Starter"))
+        project_frame.pack(fill="x", pady=(0, 8))
+
+        gh_frame = tk.Frame(right_frame, bg="#ffffff")
+        gh_frame.pack(fill="x", pady=(0, 8))
+
+        repo_frame = tk.Frame(right_frame, bg="#ffffff")
+        repo_frame.pack(fill="x", pady=(0, 8))
+
+        dl_frame = tk.Frame(right_frame, bg="#ffffff")
+        dl_frame.pack(fill="x", pady=(0, 8))
+
+        # Enlaces clickeables y etiquetas
+        # Proyecto
+        tk.Label(
+            project_frame,
+            text=get_translation("about_project", self.language),
+            font=("Segoe UI", 9),
+            bg="#ffffff"
+        ).pack(side="left")
+
+        link_btn = tk.Label(
+            project_frame, 
+            text="https://github.com/kennethpintomedina/mpvstarter",
+            **link_style
+        )
+        link_btn.pack(side="left", padx=(4, 0))
+        link_btn.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/kennethpintomedina/mpvstarter"))
 
         # GitHub personal
-        gh_frame = tk.Frame(right_frame, bg="#ffffff")
-        gh_frame.pack(fill="x", pady=(4, 8))
-        tk.Label(gh_frame, text="🐙", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
-        tk.Label(gh_frame, text=get_translation("about_github", self.language), 
-                 font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
-        gh_link = tk.Label(gh_frame, text="github.com/KAPINTOM", **link_style)
-        gh_link.pack(side="left")
-        gh_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/KAPINTOM"))
+        tk.Label(
+            gh_frame,
+            text=get_translation("about_github", self.language),
+            font=("Segoe UI", 9),
+            bg="#ffffff"
+        ).pack(side="left")
+        
+        link_btn = tk.Label(
+            gh_frame,
+            text="https://github.com/kennethpintomedina",
+            **link_style
+        )
+        link_btn.pack(side="left", padx=(4, 0))
+        link_btn.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/kennethpintomedina"))
 
-        # MPV repo
-        repo_frame = tk.Frame(right_frame, bg="#ffffff")
-        repo_frame.pack(fill="x", pady=(4, 8))
-        tk.Label(repo_frame, text="📦", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
-        tk.Label(repo_frame, text=get_translation("about_repo", self.language), 
-                 font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
-        repo_link = tk.Label(repo_frame, text="github.com/mpv-player/mpv", **link_style)
-        repo_link.pack(side="left")
-        repo_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/mpv-player/mpv"))
+        # Repositorio MPV
+        tk.Label(
+            repo_frame,
+            text=get_translation("about_repo", self.language),
+            font=("Segoe UI", 9),
+            bg="#ffffff"
+        ).pack(side="left")
+        
+        link_btn = tk.Label(
+            repo_frame,
+            text="https://github.com/mpv-player/mpv",
+            **link_style
+        )
+        link_btn.pack(side="left", padx=(4, 0))
+        link_btn.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/mpv-player/mpv"))
 
-        # MPV downloads
-        dl_frame = tk.Frame(right_frame, bg="#ffffff")
-        dl_frame.pack(fill="x", pady=(4, 8))
-        tk.Label(dl_frame, text="⬇️", font=("Segoe UI Emoji", 12), bg="#ffffff").pack(side="left")
-        tk.Label(dl_frame, text=get_translation("about_download", self.language), 
-                 font=("Segoe UI", 10, "bold"), bg="#ffffff").pack(side="left", padx=(4, 2))
-        dl_link = tk.Label(dl_frame, text="mpv-winbuild releases", **link_style)
-        dl_link.pack(side="left")
-        dl_link.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/zhongfly/mpv-winbuild/releases"))
+        # Descargas MPV
+        tk.Label(
+            dl_frame,
+            text=get_translation("about_download", self.language),
+            font=("Segoe UI", 9),
+            bg="#ffffff"
+        ).pack(side="left")
+        
+        link_btn = tk.Label(
+            dl_frame,
+            text="https://sourceforge.net/projects/mpv-player-windows/files",
+            **link_style
+        )
+        link_btn.pack(side="left", padx=(4, 0))
+        link_btn.bind("<Button-1>", lambda e: webbrowser.open("https://sourceforge.net/projects/mpv-player-windows/files"))
 
         # Línea decorativa inferior
         tk.Frame(right_frame, bg="#1976d2", height=2).pack(fill="x", pady=(20, 8))
@@ -1313,7 +1371,7 @@ class Application(tk.Tk):
         tk.Label(
             bottom_frame,
             text=get_translation("about_year", self.language),
-            font=("Segoe UI", 10, "italic"),
+            font=("Segoe UI", 9, "italic"),
             bg="#ffffff",
             fg="#888888"
         ).pack(side="left", padx=(4, 0))
@@ -1321,7 +1379,7 @@ class Application(tk.Tk):
             bottom_frame,
             text=get_translation("close", self.language),
             command=about.destroy,
-            font=("Segoe UI", 10, "bold"),
+            font=("Segoe UI", 9, "bold"),
             bg="#1976d2",
             fg="#ffffff",
             activebackground="#1565c0",
@@ -1330,6 +1388,73 @@ class Application(tk.Tk):
             padx=16,
             pady=4
         ).pack(side="right", padx=(0, 4))
+
+    def install_modern_ui(self):
+        """Instala la interfaz moderna de OSC"""
+        try:
+            if not self.mpv_path:
+                raise ValueError("MPV no está seleccionado")
+
+            mpv_dir = Path(self.mpv_path).parent
+            mpv_config_dir = mpv_dir / "mpv"
+            scripts_dir = mpv_config_dir / "scripts"
+            fonts_dir = mpv_config_dir / "fonts"
+
+            # Crear directorios necesarios
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            fonts_dir.mkdir(parents=True, exist_ok=True)
+
+            # URLs de los archivos
+            modern_lua_url = "https://raw.githubusercontent.com/maoiscat/mpv-osc-modern/main/modern.lua"
+            font_url = "https://raw.githubusercontent.com/maoiscat/mpv-osc-modern/main/Material-Design-Iconic-Font.ttf"
+
+            # Descargar archivos
+            modern_lua_path = scripts_dir / "modern.lua"
+            font_path = fonts_dir / "Material-Design-Iconic-Font.ttf"
+
+            response = requests.get(modern_lua_url)
+            response.raise_for_status()
+            modern_lua_path.write_bytes(response.content)
+
+            response = requests.get(font_url)
+            response.raise_for_status()
+            font_path.write_bytes(response.content)
+
+            # Configurar mpv.conf
+            conf_path = mpv_config_dir / "mpv.conf"
+            config_content = """
+osc=no
+
+[Idle]
+profile-cond=p["idle-active"]
+profile-restore=copy-equal
+title=' '
+keepaspect=no
+background=1
+"""
+            # Verificar si el contenido ya existe en el archivo
+            existing_content = ""
+            if conf_path.exists():
+                existing_content = conf_path.read_text(encoding="utf-8")
+                
+            # Verificar si alguna de las líneas importantes ya existe
+            required_lines = ["osc=no", "[Idle]", "profile-cond=p[\"idle-active\"]"]
+            config_exists = all(line in existing_content for line in required_lines)
+
+            if not config_exists:
+                # Agregar al final del archivo si existe, o crear nuevo
+                if conf_path.exists():
+                    with conf_path.open("a", encoding="utf-8") as f:
+                        f.write("\n" + config_content)
+                else:
+                    conf_path.write_text(config_content, encoding="utf-8")
+
+                messagebox.showinfo("Éxito", "Interfaz moderna instalada correctamente")
+            else:
+                messagebox.showinfo("Información", "La configuración de la interfaz moderna ya está instalada")
+
+        except Exception as e:
+            self.show_error(f"Error instalando la interfaz moderna: {e}")
 
     # endregion
 
