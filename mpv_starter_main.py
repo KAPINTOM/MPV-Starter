@@ -840,7 +840,15 @@ class Application(tk.Tk):
             text="📂 " + get_translation("load_local", self.language),
             command=self.load_local_file
         ).pack(fill="x", pady=(0, 5))
-        
+
+        # --- NUEVO BOTÓN INSTALAR MPV ---
+        ttk.Button(
+            header_frame,
+            text="⬇️ Instalar MPV",
+            command=self.install_mpv
+        ).pack(fill="x", pady=(0, 5))
+        # --- FIN NUEVO BOTÓN ---
+
         # Estado de MPV
         self.mpv_label = ttk.Label(
             header_frame,
@@ -1455,6 +1463,48 @@ background=1
 
         except Exception as e:
             self.show_error(f"Error instalando la interfaz moderna: {e}")
+
+    def install_mpv(self):
+        """Descarga y ejecuta el instalador de MPV si no existe la carpeta o no hay ejecutable seleccionado."""
+        try:
+            # Carpeta donde se instalará MPV
+            mpv_folder = Path(CONFIG_DIR) / "mpv"
+            if mpv_folder.exists():
+                messagebox.showinfo("Instalación MPV", "La carpeta 'mpv' ya existe.")
+                return
+            if self.mpv_path and Path(self.mpv_path).exists():
+                messagebox.showinfo("Instalación MPV", "Ya se ha seleccionado un ejecutable de MPV.")
+                return
+
+            mpv_folder.mkdir(parents=True, exist_ok=True)
+
+            # URLs de los archivos
+            bat_url = "https://raw.githubusercontent.com/KAPINTOM/MPV-Starter/main/updater.bat"
+            ps1_url = "https://raw.githubusercontent.com/KAPINTOM/MPV-Starter/main/updater.ps1"
+
+            bat_path = mpv_folder / "updater.bat"
+            ps1_path = mpv_folder / "updater.ps1"
+
+            # Descargar updater.bat
+            r = requests.get(bat_url)
+            r.raise_for_status()
+            bat_path.write_bytes(r.content)
+
+            # Descargar updater.ps1
+            r = requests.get(ps1_url)
+            r.raise_for_status()
+            ps1_path.write_bytes(r.content)
+
+            # Ejecutar updater.bat
+            subprocess.Popen(
+                [str(bat_path)],
+                cwd=str(mpv_folder),
+                creationflags=subprocess.CREATE_NEW_CONSOLE
+            )
+            messagebox.showinfo("Instalación MPV", "Descarga iniciada. Sigue las instrucciones en la ventana de comandos.")
+
+        except Exception as e:
+            self.show_error(f"Error instalando MPV: {e}")
 
     # endregion
 
