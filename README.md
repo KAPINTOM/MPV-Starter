@@ -154,33 +154,31 @@
 
 ### Créditos / Credits / クレジット / 致谢 / 크레딧 / Разработчики
 
-Desarrollado por Kenneth Andrey Pinto Medina  
-GitHub: [KAPINTOM](https://github.com/KAPINTOM)
+Developed by Kenneth Andrey Pinto Medina  
+GitHub: [KAPINTOM](https://github.com/KAPINTOM)  
 
-**Instaladores automáticos de MPV basados en:**  
-Repositorio: [zhongfly/mpv-winbuild](https://github.com/zhongfly/mpv-winbuild/releases)  
-Gracias a [zhongfly](https://github.com/zhongfly) por proveer builds y scripts de actualización para MPV en Windows.
+**Automatic MPV Installers Based On:**  
+Repository: [zhongfly/mpv-winbuild](https://github.com/zhongfly/mpv-winbuild/releases)  
+Thanks to [zhongfly](https://github.com/zhongfly) for providing builds and update scripts for MPV on Windows.  
 
----
+---  
 
-### Información adicional relevante
+### Additional Relevant Information  
 
-- **Instalador automático de MPV:**  
-  Si no tienes MPV instalado, puedes descargarlo y configurarlo automáticamente desde la propia aplicación. El botón "Instalar MPV" crea una carpeta `mpv`, descarga los instaladores y ejecuta el script de instalación.
+- **Automatic MPV Installer:**  
+  If you don't have MPV installed, you can download and configure it automatically from the application itself. The "Install MPV" button creates an `mpv` folder, downloads the installers, and runs the installation script.  
 
-- **Instalador de interfaz moderna (OSC Modern):**  
-  Puedes instalar la interfaz gráfica moderna para MPV (OSC Modern) desde el menú principal, lo que mejora la experiencia visual del reproductor.
+- **Modern Interface Installer (OSC Modern):**  
+  You can install the modern graphical interface for MPV (OSC Modern) from the main menu, enhancing the visual experience of the player.  
 
-- **Gestión segura de archivos de configuración:**  
-  Todos los archivos de configuración, historial y marcadores se almacenan de forma local y segura junto al ejecutable/script.
+- **Secure Configuration File Management:**  
+  All configuration files, history, and bookmarks are stored locally and securely alongside the executable/script.  
 
-- **Soporte multilenguaje completo:**  
-  La interfaz y todos los mensajes están traducidos a 10 idiomas, seleccionables desde el menú.
+- **Full Multilingual Support:**  
+  The interface and all messages are translated into 10 languages, selectable from the menu.  
 
-- **Validación avanzada:**  
-  El programa valida tanto enlaces web como rutas de archivos locales antes de lanzar MPV, evitando errores comunes.
+- **Advanced Validation:**  
+  The program validates both web links and local file paths before launching MPV, preventing common errors.  
 
 - **Portable:**  
-  No requiere instalación tradicional. Todos los datos y configuraciones permanecen en la carpeta de la aplicación.
-
----
+  No traditional installation required. All data and settings remain in the application folder.
