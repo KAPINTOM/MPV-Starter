@@ -20,6 +20,8 @@
 ### Características principales
 - **Reproducción flexible:** Soporta enlaces web (YouTube, Twitch, etc.) **y archivos locales** (MP4, MKV, AVI).
 - **Selección de MPV:** Especifica fácilmente la ruta del ejecutable de MPV.
+- **Instalador automático de MPV:** Descarga y ejecuta MPV fácilmente desde la propia aplicación si aún no lo tienes instalado.
+- **Instalador de interfaz moderna:** Instala la interfaz gráfica moderna (OSC Modern) para MPV con un solo clic.
 - **Parámetros personalizados:** Añade y guarda parámetros de lanzamiento para MPV.
 - **Historial inteligente:** Guarda automáticamente las últimas 100 reproducciones (accesible desde el menú).
 - **Gestión de marcadores:** Almacena enlaces y archivos locales con títulos personalizados.
@@ -42,6 +44,8 @@
 ### Main Features
 - **Flexible playback:** Supports web links (YouTube, Twitch, etc.) **and local files** (MP4, MKV, AVI).
 - **MPV executable selection:** Easily specify the path to MPV.
+- **Automatic MPV installer:** Download and run MPV directly from the app if you don't have it yet.
+- **Modern UI installer:** Install the modern graphical interface (OSC Modern) for MPV with one click.
 - **Custom parameters:** Add and save launch parameters for MPV.
 - **Smart history:** Automatically saves last 100 played items (accessible via menu).
 - **Bookmark management:** Store web links and local files with custom titles.
@@ -64,6 +68,8 @@
 ### 主な機能
 - **柔軟な再生:** ウェブリンク（YouTube、Twitch等）**とローカルファイル**（MP4、MKV、AVI）をサポート。
 - **MPV実行ファイルの選択:** MPVの実行ファイルパスを簡単に選択。
+- **MPV自動インストーラー:** アプリから直接MPVをダウンロード・実行できます。
+- **モダンUIインストーラー:** ワンクリックでMPV用のモダンなグラフィカルインターフェース（OSC Modern）をインストール。
 - **カスタムパラメータ:** MPVの起動パラメータを追加・選択・保存。
 - **履歴管理:** 最大100件の再生履歴を自動保存（メニューからアクセス可能）。
 - **ブックマーク管理:** ウェブリンクとローカルファイルをタイトル付きで保存。
@@ -86,6 +92,8 @@
 ### 主要功能
 - **灵活播放:** 支持网络链接（YouTube、Twitch 等）**和本地文件**（MP4、MKV、AVI）。
 - **选择MPV可执行文件:** 轻松指定MPV路径。
+- **自动MPV安装器:** 可直接从应用下载并运行MPV。
+- **现代UI安装器:** 一键安装MPV的现代图形界面（OSC Modern）。
 - **自定义参数:** 添加、选择并保存MPV启动参数。
 - **历史记录管理:** 自动保存最近100条播放记录（可通过菜单访问）。
 - **书签管理:** 保存并管理网络链接和本地文件。
@@ -108,6 +116,8 @@
 ### 주요 기능
 - **유연한 재생:** 웹 링크 (YouTube, Twitch 등) **및 로컬 파일** (MP4, MKV, AVI) 지원.
 - **MPV 실행 파일 선택:** MPV 실행 경로를 쉽게 지정합니다.
+- **자동 MPV 설치기:** 앱에서 직접 MPV를 다운로드하고 실행할 수 있습니다.
+- **모던 UI 설치기:** 한 번의 클릭으로 MPV용 현대적 그래픽 인터페이스(OSC Modern) 설치.
 - **사용자 정의 매개변수:** MPV 실행 매개변수를 추가/선택/저장합니다.
 - **기록 관리:** 최대 100개의 재생 기록을 자동 저장합니다 (메뉴에서 접근 가능).
 - **북마크 관리:** 웹 링크와 로컬 파일을 제목과 함께 저장합니다.
@@ -130,6 +140,8 @@
 ### Основные функции
 - **Гибкое воспроизведение:** Поддержка веб-ссылок (YouTube, Twitch и др.) **и локальных файлов** (MP4, MKV, AVI).
 - **Выбор исполняемого файла MPV:** Укажите путь к MPV.
+- **Автоматический установщик MPV:** Скачайте и запустите MPV прямо из приложения.
+- **Установщик современной оболочки:** Установите современный графический интерфейс (OSC Modern) для MPV одним кликом.
 - **Пользовательские параметры:** Добавляйте и сохраняйте параметры для MPV.
 - **История:** Автоматическое сохранение последних 100 воспроизведений.
 - **Закладки:** Управляйте веб-ссылками и локальными файлами с названиями.
@@ -140,21 +152,35 @@
 
 ---
 
-### Requisitos / Requirements / 要件 / 要求 / 요구 사항 / Требования
-（... технические требования без изменений ...）
-
----
-
-### Instalación y uso / Installation and Usage / インストールと使用 / 安装与使用 / 설치 및 사용법 / Установка и использование
-（... секции установки без изменений ...）
-
----
-
-### Compilación (opcional) / Compilation (optional) / コンパイル方法（オプション） / 编译（可选） / 컴파일 방법（선택 사항） / Компиляция (опционально)
-（... команды компиляции без изменений ...）
-
----
-
 ### Créditos / Credits / クレジット / 致谢 / 크레딧 / Разработчики
+
 Desarrollado por Kenneth Andrey Pinto Medina  
 GitHub: [KAPINTOM](https://github.com/KAPINTOM)
+
+**Instaladores automáticos de MPV basados en:**  
+Repositorio: [zhongfly/mpv-winbuild](https://github.com/zhongfly/mpv-winbuild/releases)  
+Gracias a [zhongfly](https://github.com/zhongfly) por proveer builds y scripts de actualización para MPV en Windows.
+
+---
+
+### Información adicional relevante
+
+- **Instalador automático de MPV:**  
+  Si no tienes MPV instalado, puedes descargarlo y configurarlo automáticamente desde la propia aplicación. El botón "Instalar MPV" crea una carpeta `mpv`, descarga los instaladores y ejecuta el script de instalación.
+
+- **Instalador de interfaz moderna (OSC Modern):**  
+  Puedes instalar la interfaz gráfica moderna para MPV (OSC Modern) desde el menú principal, lo que mejora la experiencia visual del reproductor.
+
+- **Gestión segura de archivos de configuración:**  
+  Todos los archivos de configuración, historial y marcadores se almacenan de forma local y segura junto al ejecutable/script.
+
+- **Soporte multilenguaje completo:**  
+  La interfaz y todos los mensajes están traducidos a 10 idiomas, seleccionables desde el menú.
+
+- **Validación avanzada:**  
+  El programa valida tanto enlaces web como rutas de archivos locales antes de lanzar MPV, evitando errores comunes.
+
+- **Portable:**  
+  No requiere instalación tradicional. Todos los datos y configuraciones permanecen en la carpeta de la aplicación.
+
+---
