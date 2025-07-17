@@ -2,8 +2,7 @@
 
 <img src="https://github.com/KAPINTOM/MPV-Starter/blob/main/Images/mpv%20starter.png" alt="GUI" width="500">
 
----
-## 🇬🇧 MPV Graphical Launcher (web links & local files)
+## MPV Graphical Launcher (web links & local files)
 
 **MPV Starter** is a graphical application that lets you launch the [MPV](https://mpv.io/) player easily **with web links and local files** (YouTube, Twitch, Vimeo, MP4/MKV/AVI files, etc.), manage custom parameters, history, and bookmarks, all from an intuitive and multilingual interface.
 
