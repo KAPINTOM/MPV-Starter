@@ -492,6 +492,18 @@ TRANSLATIONS = {
         "it": "Installa UI Moderna",
         "ru": "Установить современный интерфейс",
         "de": "Moderne UI installieren"
+    },
+    "install_mpv": {
+        "en": "Install MPV",
+        "es": "Instalar MPV",
+        "ja": "MPVをインストール",
+        "zh": "安装MPV",
+        "ko": "MPV 설치",
+        "pt": "Instalar MPV",
+        "fr": "Installer MPV",
+        "it": "Installa MPV",
+        "ru": "Установить MPV",
+        "de": "MPV installieren"
     }
     # Agrega más claves según sea necesario...
 }
@@ -582,6 +594,57 @@ class Application(tk.Tk):
             foreground="white",
             padding=(12, 6),
             borderwidth=0
+        )
+        
+        # ADDED: Different button styles
+        # Blue button
+        self.style.configure(
+            "Blue.TButton",
+            background="#1e88e5",  # Blue
+            foreground="white",
+        )
+        self.style.map("Blue.TButton",
+            background=[("active", "#1565c0"), ("!active", "#1e88e5")]
+        )
+        
+        # Green button
+        self.style.configure(
+            "Green.TButton",
+            background="#43a047",  # Green
+            foreground="white",
+        )
+        self.style.map("Green.TButton",
+            background=[("active", "#2e7d32"), ("!active", "#43a047")]
+        )
+        
+        # Purple button
+        self.style.configure(
+            "Purple.TButton",
+            background="#7e57c2",  # Purple
+            foreground="white",
+        )
+        self.style.map("Purple.TButton",
+            background=[("active", "#5e35b1"), ("!active", "#7e57c2")]
+        )
+        
+        # Orange button
+        self.style.configure(
+            "Orange.TButton",
+            background="#ff9800",  # Orange
+            foreground="white",
+        )
+        self.style.map("Orange.TButton",
+            background=[("active", "#f57c00"), ("!active", "#ff9800")]
+        )
+        
+        # Red button
+        self.style.configure(
+            "Red.TButton",
+            background="#e53935",  # Red
+            foreground="white",
+        )
+        self.style.map("Red.TButton",
+            background=[("active", "#c62828"), ("!active", "#e53935")]
         )
         
         # Botón de acción principal
@@ -815,39 +878,52 @@ class Application(tk.Tk):
         header_frame = ttk.Frame(main_frame, style="TFrame")
         header_frame.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 15))
         
-        # Botones principales con iconos
+        # Botones principales con iconos y colores distintos en una cuadrícula 2x2
+        button_frame = ttk.Frame(header_frame)
+        button_frame.pack(fill="x", pady=(0, 10))
+
+        # Fila 1
         ttk.Button(
-            header_frame,
+            button_frame,
             text="🛠️ " + get_translation("select_mpv", self.language),
-            command=self.select_mpv_exe
-        ).pack(fill="x", pady=(0, 5))
+            command=self.select_mpv_exe,
+            style="Blue.TButton"
+        ).grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
-        # Nuevo botón de actualización
         ttk.Button(
-            header_frame,
+            button_frame,
             text="🔄 " + get_translation("update_mpv", self.language),
-            command=self.update_mpv
-        ).pack(fill="x", pady=(0, 5))
+            command=self.update_mpv,
+            style="Green.TButton"
+        ).grid(row=0, column=1, padx=5, pady=5, sticky="ew")
 
+        # Fila 2
         ttk.Button(
-            header_frame,
+            button_frame,
             text="🎨 " + get_translation("install_modern_ui", self.language),
-            command=self.install_modern_ui
-        ).pack(fill="x", pady=(0, 5))
+            command=self.install_modern_ui,
+            style="Purple.TButton"
+        ).grid(row=1, column=0, padx=5, pady=5, sticky="ew")
 
         ttk.Button(
-            header_frame,
+            button_frame,
             text="📂 " + get_translation("load_local", self.language),
-            command=self.load_local_file
-        ).pack(fill="x", pady=(0, 5))
+            command=self.load_local_file,
+            style="Orange.TButton"
+        ).grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
-        # --- NUEVO BOTÓN INSTALAR MPV ---
-        ttk.Button(
-            header_frame,
-            text="⬇️ Instalar MPV",
-            command=self.install_mpv
-        ).pack(fill="x", pady=(0, 5))
-        # --- FIN NUEVO BOTÓN ---
+        # Botón de instalación MPV (fila 3, columna 0-1)
+        self.install_mpv_button = ttk.Button(
+            button_frame,
+            text="⬇️ " + get_translation("install_mpv", self.language),
+            command=self.install_mpv,
+            style="Red.TButton"
+        )
+        self.install_mpv_button.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="ew")
+
+        # Configurar pesos de columnas para expansión
+        button_frame.columnconfigure(0, weight=1)
+        button_frame.columnconfigure(1, weight=1)
 
         # Estado de MPV
         self.mpv_label = ttk.Label(
@@ -857,7 +933,7 @@ class Application(tk.Tk):
             foreground="#1976d2"
         )
         self.mpv_label.pack(fill="x", pady=(5, 0))
-        
+
         # Sección de entrada de datos
         content_frame = ttk.Frame(main_frame)
         content_frame.grid(row=1, column=0, columnspan=2, sticky="ew", pady=10)
@@ -993,6 +1069,8 @@ class Application(tk.Tk):
                     for key in TRANSLATIONS:
                         if text == TRANSLATIONS[key].get("en") or text == TRANSLATIONS[key].get(self.language):
                             widget.config(text=get_translation(key, self.language))
+            # Update the install MPV button text
+            self.install_mpv_button.config(text="⬇️ " + get_translation("install_mpv", self.language))
             # Actualiza los labels y botones en about window si está abierta
             # (Opcional: puedes guardar la referencia y actualizarla)
         except Exception:
