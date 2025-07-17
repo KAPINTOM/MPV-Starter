@@ -1198,26 +1198,82 @@ class Application(tk.Tk):
             self.show_error(str(e))
 
     def refresh_param_checkboxes(self):
-        """Actualiza las casillas de parámetros en columnas"""
+        """Actualiza las casillas de parámetros con desplazamiento"""
         try:
-            for widget in self.param_frame.winfo_children():
-                widget.destroy()
+            # Destruir el frame existente si existe
+            if hasattr(self, 'param_canvas_frame'):
+                self.param_canvas_frame.destroy()
+            
+            # Crear un canvas con scrollbar
+            self.param_canvas = tk.Canvas(self.param_frame, borderwidth=0)
+            self.scrollbar = ttk.Scrollbar(
+                self.param_frame, 
+                orient="vertical", 
+                command=self.param_canvas.yview
+            )
+            self.param_canvas_frame = ttk.Frame(self.param_canvas)
 
+            # Configurar el canvas
+            self.param_canvas_frame.bind(
+                "<Configure>",
+                lambda e: self.param_canvas.configure(
+                    scrollregion=self.param_canvas.bbox("all")
+                )
+            )
+            self.param_canvas.create_window(
+                (0, 0), 
+                window=self.param_canvas_frame, 
+                anchor="nw"
+            )
+            self.param_canvas.configure(yscrollcommand=self.scrollbar.set)
+
+            # Empacar los widgets
+            self.param_canvas.pack(side="left", fill="both", expand=True)
+            self.scrollbar.pack(side="right", fill="y")
+
+            # Crear casillas de verificación en columnas dentro del frame desplazable
             num_params = len(self.params)
             num_columns = 3
             num_rows = (num_params + num_columns - 1) // num_columns
-
+            
+            # Configurar pesos de columnas
+            for i in range(num_columns):
+                self.param_canvas_frame.columnconfigure(i, weight=1)
+            
+            # Crear checkbuttons en una cuadrícula
             for i, param in enumerate(self.params):
                 var = tk.BooleanVar()
                 self.param_vars[param] = var
+                
                 row = i % num_rows
                 column = i // num_rows
-                tk.Checkbutton(
-                    self.param_frame,
+                
+                cb = ttk.Checkbutton(
+                    self.param_canvas_frame,
                     text=param,
                     variable=var,
                     command=self.update_params_entry
-                ).grid(row=row, column=column, sticky="w")
+                )
+                cb.grid(
+                    row=row, 
+                    column=column, 
+                    sticky="w", 
+                    padx=5, 
+                    pady=2
+                )
+                
+                # Ajustar el tamaño del canvas al contenido
+                cb.update_idletasks()
+                self.param_canvas.config(scrollregion=self.param_canvas.bbox("all"))
+            
+            # Configurar desplazamiento con rueda del ratón
+            self.param_canvas.bind_all(
+                "<MouseWheel>", 
+                lambda event: self.param_canvas.yview_scroll(
+                    int(-1*(event.delta/120)), 
+                    "units"
+                )
+            )
 
         except Exception as e:
             self.show_error(f"Error actualizando parámetros: {e}")
